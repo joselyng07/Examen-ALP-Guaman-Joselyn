@@ -1,0 +1,4 @@
+E001;Ana Torres;15;18;12
+E002;Luis Pérez;8;10;12
+E003;Marta Ruiz;20;18;19
+E004;Carlos Mena;12;13;14
