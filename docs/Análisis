@@ -1,0 +1,63 @@
+# Analisis - Sistema AulaLogic (Variante C)
+
+## 1. Problema
+Registrar, consultar, procesar y almacenar las calificaciones de los estudiantes de una asignatura, conservar los
+registros entre ejecuciones y generar indicadores del rendimiento del curso. Aplicacion de consola en Java.
+
+**Regla configurada (Variante C):** promedio minimo de aprobacion = **13** (APROBADO si promedio >= 13).
+
+## 2. Entrada - Proceso - Salida
+
+| Entrada | Proceso | Salida |
+|---|---|---|
+| Opcion del menu (1-6) | Seleccion con `switch` dentro de un ciclo `do-while` | Ejecucion de la funcionalidad o mensaje de opcion incorrecta |
+| Codigo, nombre y 3 calificaciones | Validacion (vacio, `;`, duplicado, rango 0-20), almacenamiento en arreglo y `ArrayList` | Confirmacion o mensaje de error |
+| Codigo a buscar | Busqueda secuencial en el `ArrayList` | Datos completos del estudiante o aviso de inexistencia |
+| Registros en memoria | Promedio, maximo, minimo, estado, conteos, ordenamiento por promedio | Reporte academico y listados |
+| Archivo `datos/estudiantes.txt` | Lectura con `BufferedReader` y conversion de tipos | Objetos `Estudiante` recuperados |
+| Registros en memoria | Escritura completa con `BufferedWriter` | Archivo actualizado sin duplicados |
+
+## 3. Variables y constantes principales
+
+| Nombre | Tipo | Descripcion |
+|---|---|---|
+| `LIMITE_APROBACION` | `static final double` = 13.0 | Promedio minimo para aprobar (Variante C) |
+| `CANTIDAD_NOTAS` | `static final int` = 3 | Numero de calificaciones por estudiante |
+| `codigo`, `nombre` | `String` | Identificacion del estudiante |
+| `notas` | `int[]` | Las tres calificaciones |
+| `estudiantes` | `ArrayList<Estudiante>` | Coleccion de registros |
+| `RUTA_ARCHIVO` | `String` | `datos/estudiantes.txt` |
+
+## 4. Diseno de clases
+
+- **Estudiante**: atributos privados `codigo`, `nombre`, `notas`; constructor; getters; `calcularPromedio()` (division real, `suma / (double) 3`),
+  `obtenerNotaMaxima()`, `obtenerNotaMinima()`, `obtenerEstado()`.
+- **GestionAcademica**: administra el `ArrayList<Estudiante>`; registra con validacion, busca, lista, calcula indicadores
+  (aprobados, reprobados, promedio general, porcentaje, mejor/peor promedio, bajo el promedio general) y ordena de mayor a menor.
+- **GestorArchivos**: `guardar()` (FileWriter + BufferedWriter) y `cargar()` (FileReader + BufferedReader) con `try-catch`.
+- **Main**: menu, captura de datos, coordinacion de las clases y control del flujo.
+
+Colaboracion: `Main` -> `GestionAcademica` y `GestorArchivos`; `GestionAcademica` -> `Estudiante`; `GestorArchivos` -> `Estudiante`.
+
+## 5. Algoritmos clave
+1. **Promedio:** acumulador de las 3 notas dividido entre 3.0 (sin division entera).
+2. **Maximo / minimo:** se toma la primera nota como referencia y se recorre el arreglo comparando. En empate entre estudiantes se conserva el primero registrado.
+3. **Ordenamiento:** seleccion sobre una copia de la lista (mayor a menor promedio) para no alterar el orden de registro.
+4. **Promedio general:** media de los promedios; si la lista esta vacia devuelve 0 (evita dividir entre cero).
+5. **Persistencia:** el archivo se sobrescribe completo en cada guardado (`append = false`), por lo que no se duplican registros.
+   Al cargar, el promedio y el estado **no se almacenan**: se recalculan desde las notas.
+
+## 6. Formato del archivo
+```text
+codigo;nombre;nota1;nota2;nota3
+E001;Ana Torres;15;18;12
+```
+Por eso `;` esta prohibido en codigo y nombre. Las lineas mal formadas se omiten con un aviso al cargar.
+
+## 7. Control de errores
+- Opcion de menu no numerica o fuera de rango: mensaje y se repite el menu.
+- Calificacion no numerica o fuera de 0-20: se vuelve a solicitar.
+- Codigo vacio, con `;` o repetido: se rechaza el registro.
+- Archivo inexistente: se inicia con lista vacia; el archivo se crea al guardar (incluida la carpeta `datos/`).
+- Lista vacia en reporte/listado: mensaje informativo.
+- Fin inesperado de la entrada estandar: se guarda y se sale de forma ordenada.
